@@ -1,5 +1,6 @@
+import { Icon } from './components/Icon';
 import { getGenerator, GENERATORS } from './generators';
-import { GeneratorPage } from './pages/GeneratorPage';
+import { GeneratorPage } from './pages/editor/GeneratorPage';
 import { Home } from './pages/Home';
 import { hrefFor, useRoute } from './lib/router';
 
@@ -25,9 +26,7 @@ export function App() {
       <header className="topbar">
         <a className="brand" href={hrefFor('/')}>
           <span className="brand-mark" aria-hidden>
-            <svg viewBox="0 0 24 24">
-              <path d="M9 7l8 5-8 5z" />
-            </svg>
+            <Icon name="logo" />
           </span>
           Video Asset Maker
         </a>

@@ -2,6 +2,7 @@ import type { Generator, Params, SizePreset } from '../generators/types';
 import { durationOf } from '../generators/types';
 import { EXPORT_SAMPLE_RATE, renderSegment } from './audio';
 import { fontsReady } from './fonts';
+import { setStyle } from './draw';
 
 export function renderFrame(canvas: HTMLCanvasElement, g: Generator, p: Params, size: SizePreset, t: number, preview: boolean) {
   if (canvas.width !== size.width) canvas.width = size.width;
@@ -11,11 +12,7 @@ export function renderFrame(canvas: HTMLCanvasElement, g: Generator, p: Params, 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, size.width, size.height);
   // Reset state a previous render may have leaked.
-  ctx.globalAlpha = 1;
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.filter = 'none';
-  ctx.letterSpacing = '0px';
-  ctx.textAlign = 'left';
+  setStyle(ctx, { globalAlpha: 1, globalCompositeOperation: 'source-over', filter: 'none', letterSpacing: '0px', textAlign: 'left' });
   ctx.textBaseline = 'alphabetic';
   g.render(ctx, p, t, { width: size.width, height: size.height, preview });
   ctx.restore();
@@ -45,8 +42,7 @@ export async function exportImage(g: Generator, p: Params, size: SizePreset, t: 
     // JPEG has no alpha: flatten any transparent areas onto black rather than leaving it to the encoder.
     const ctx = canvas.getContext('2d')!;
     ctx.save();
-    ctx.globalCompositeOperation = 'destination-over';
-    ctx.fillStyle = '#000';
+    setStyle(ctx, { globalCompositeOperation: 'destination-over', fillStyle: '#000' });
     ctx.fillRect(0, 0, size.width, size.height);
     ctx.restore();
   }
@@ -146,8 +142,7 @@ export async function exportVideo(
         // Without an alpha channel, flatten onto black so transparent areas encode predictably.
         const ctx = canvas.getContext('2d')!;
         ctx.save();
-        ctx.globalCompositeOperation = 'destination-over';
-        ctx.fillStyle = '#000';
+        setStyle(ctx, { globalCompositeOperation: 'destination-over', fillStyle: '#000' });
         ctx.fillRect(0, 0, size.width, size.height);
         ctx.restore();
       }

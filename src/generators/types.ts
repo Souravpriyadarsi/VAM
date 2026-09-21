@@ -31,11 +31,16 @@ interface BaseControl {
   hint?: string;
 }
 
+export interface Option {
+  value: string;
+  label: string;
+}
+
 export type Control =
   | (BaseControl & { type: 'text'; default: string; multiline?: boolean; placeholder?: string })
   | (BaseControl & { type: 'number'; default: number; min: number; max: number; step?: number; unit?: string })
   | (BaseControl & { type: 'color'; default: string })
-  | (BaseControl & { type: 'select'; default: string; options: { value: string; label: string }[] })
+  | (BaseControl & { type: 'select'; default: string; options: Option[] })
   | (BaseControl & { type: 'toggle'; default: boolean })
   | (BaseControl & { type: 'image'; default: null })
   | (BaseControl & { type: 'audio'; default: null });
@@ -122,3 +127,10 @@ export function defaultParams(g: Generator): Params {
 export function stylePresets(base: Params, looks: Record<string, Params>): Preset[] {
   return Object.entries(looks).map(([name, overrides]) => ({ name, params: { ...base, ...overrides } }));
 }
+
+/** Only show a set of controls when a predicate passes (merged with any showIf they already have). */
+export const onlyIf = (controls: Control[], pred: (p: Params) => boolean): Control[] =>
+  controls.map((c) => ({ ...c, showIf: (p: Params) => pred(p) && (c.showIf ? c.showIf(p) : true) }));
+
+/** Select options from a `{ value: 'Label' }` map, in the order written. */
+export const opts = (map: Record<string, string>): Option[] => Object.entries(map).map(([value, label]) => ({ value, label }));

@@ -1,31 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { CardPreview } from '../components/CardPreview';
+import { Icon } from '../components/Icon';
 import { CATEGORIES, GENERATORS } from '../generators';
 import type { Category, Generator } from '../generators/types';
 import { hrefFor } from '../lib/router';
 import { aspectLabel } from '../lib/sizes';
+import { useStoredState } from '../lib/useStoredState';
 
-const SEARCH_KEY = 'vam:search';
-const FAVORITES_KEY = 'vam:favorites';
+const parseQuery = (raw: string | null) => raw ?? '';
+const parseFavorites = (raw: string | null) => new Set(JSON.parse(raw ?? '[]') as string[]);
+const serializeFavorites = (favorites: Set<string>) => JSON.stringify([...favorites]);
 
 function useFavorites() {
-  const [favorites, setFavorites] = useState<Set<string>>(() => {
-    try {
-      return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) ?? '[]') as string[]);
-    } catch {
-      return new Set();
-    }
-  });
+  const [favorites, setFavorites] = useStoredState('vam:favorites', parseFavorites, serializeFavorites);
   const toggle = (id: string) =>
     setFavorites((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      try {
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify([...next]));
-      } catch {
-        // ignore
-      }
+      if (!next.delete(id)) next.add(id);
       return next;
     });
   return { favorites, toggle };
@@ -55,9 +46,7 @@ function AssetCard({ generator: g, favorite, onToggleFavorite }: { generator: Ge
         aria-label={favorite ? `Remove ${g.name} from favourites` : `Add ${g.name} to favourites`}
         title={favorite ? 'Remove from favourites' : 'Add to favourites'}
       >
-        <svg viewBox="0 0 24 24" aria-hidden>
-          <path d="m12 17.3-6.2 3.7 1.6-7L2 9.2l7.1-.6L12 2l2.9 6.6 7.1.6-5.4 4.8 1.6 7z" />
-        </svg>
+        <Icon name="star" />
       </button>
       <div className={`card-media${g.transparent ? ' checker' : ''}`}>
         <CardPreview generator={g} playing={hover} />
@@ -87,14 +76,10 @@ function AssetCard({ generator: g, favorite, onToggleFavorite }: { generator: Ge
 }
 
 export function Home() {
-  const [query, setQuery] = useState(() => sessionStorage.getItem(SEARCH_KEY) ?? '');
+  const [query, setQuery] = useStoredState('vam:search', parseQuery, String, true);
   const [category, setCategory] = useState<Category | 'All' | 'Favorites'>('All');
   const { favorites, toggle } = useFavorites();
   const input = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    sessionStorage.setItem(SEARCH_KEY, query);
-  }, [query]);
 
   // "/" focuses search from anywhere on the page.
   useEffect(() => {
@@ -126,9 +111,7 @@ export function Home() {
         </h1>
         <p className="hero-sub">Thumbnails, lower thirds, intros, end screens and more. Tweak anything, export PNG or video.</p>
         <div className="search">
-          <svg viewBox="0 0 24 24" aria-hidden className="search-icon">
-            <path d="M10.5 3a7.5 7.5 0 0 1 5.96 12.06l4.24 4.24-1.4 1.4-4.24-4.24A7.5 7.5 0 1 1 10.5 3Zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z" />
-          </svg>
+          <Icon name="search" className="search-icon" />
           <input
             ref={input}
             type="search"

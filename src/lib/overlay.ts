@@ -1,4 +1,5 @@
 import type { Control, Params } from '../generators/types';
+import { opts } from '../generators/types';
 import { clamp, ease, progress } from './draw';
 import { LANDSCAPE, VERTICAL } from './sizes';
 
@@ -10,12 +11,7 @@ export function overlayBgControl(group = 'Output'): Control {
     label: 'Background',
     group,
     default: 'transparent',
-    options: [
-      { value: 'transparent', label: 'Transparent' },
-      { value: 'green', label: 'Green screen' },
-      { value: 'blue', label: 'Blue screen' },
-      { value: 'black', label: 'Black' },
-    ],
+    options: opts({ transparent: 'Transparent', green: 'Green screen', blue: 'Blue screen', black: 'Black' }),
     hint: 'Use green screen if your editor can’t import transparent WebM',
   };
 }
@@ -38,14 +34,10 @@ export function inOut(t: number, total: number, delay: number, inDur: number, ou
   return clamp(a - b);
 }
 
-export const POSITIONS = [
-  { value: 'bottom-left', label: 'Bottom left' },
-  { value: 'bottom-center', label: 'Bottom centre' },
-  { value: 'bottom-right', label: 'Bottom right' },
-  { value: 'top-left', label: 'Top left' },
-  { value: 'top-right', label: 'Top right' },
-  { value: 'center', label: 'Centre' },
-];
+export const POSITIONS = opts({
+  'bottom-left': 'Bottom left', 'bottom-center': 'Bottom centre', 'bottom-right': 'Bottom right',
+  'top-left': 'Top left', 'top-right': 'Top right', center: 'Centre',
+});
 
 /** Top-left corner for a box of size bw×bh placed at a named position with a margin. */
 export function place(pos: string, w: number, h: number, bw: number, bh: number, margin: number) {

@@ -10,6 +10,9 @@ interface History<T> {
 const MERGE_MS = 800;
 const LIMIT = 100;
 
+export type SetOptions = { record?: boolean; gesture?: boolean };
+export type Setter<T> = (update: (prev: T) => T, tag?: string, opts?: SetOptions) => void;
+
 export function useHistory<T>(initial: () => T) {
   const [h, setH] = useState<History<T>>(() => ({ past: [], present: initial(), future: [] }));
   const last = useRef<{ tag: string; at: number } | null>(null);
@@ -18,7 +21,7 @@ export function useHistory<T>(initial: () => T) {
    * Update the state. `record: false` skips history (e.g. restoring saved data); `gesture: true`
    * merges every update with the same tag into one step however long it takes (e.g. a drag).
    */
-  const set = useCallback((update: (prev: T) => T, tag = '', opts: { record?: boolean; gesture?: boolean } = {}) => {
+  const set: Setter<T> = useCallback((update, tag = '', opts: SetOptions = {}) => {
     // Decide merging outside the state updater: updaters must stay pure (StrictMode runs them twice).
     const now = performance.now();
     const merge = !!tag && last.current?.tag === tag && (opts.gesture || now - last.current.at < MERGE_MS);

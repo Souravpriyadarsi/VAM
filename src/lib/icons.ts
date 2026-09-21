@@ -1,32 +1,21 @@
+import { opts } from '../generators/types';
+import { circle, setStyle } from './draw';
+
 /** Simple glyphs drawn with canvas paths, centred on (cx, cy) inside a box of `s` pixels. */
 
-export const ICON_OPTIONS = [
-  { value: 'pin', label: 'Location pin' },
-  { value: 'price', label: 'Price tag' },
-  { value: 'calendar', label: 'Calendar' },
-  { value: 'clock', label: 'Clock' },
-  { value: 'star', label: 'Star' },
-  { value: 'heart', label: 'Heart' },
-  { value: 'music', label: 'Music note' },
-  { value: 'link', label: 'Link' },
-  { value: 'user', label: 'Person' },
-  { value: 'camera', label: 'Camera' },
-];
+export const ICON_OPTIONS = opts({
+  pin: 'Location pin', price: 'Price tag', calendar: 'Calendar', clock: 'Clock', star: 'Star',
+  heart: 'Heart', music: 'Music note', link: 'Link', user: 'Person', camera: 'Camera',
+});
 
 export function drawIcon(ctx: CanvasRenderingContext2D, name: string, cx: number, cy: number, s: number, color: string, hole: string) {
   const r = s / 2;
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.fillStyle = color;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = s * 0.11;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
+  setStyle(ctx, { fillStyle: color, strokeStyle: color, lineWidth: s * 0.11, lineCap: 'round', lineJoin: 'round' });
   const dot = (x: number, y: number, rr: number, fill = hole) => {
     ctx.fillStyle = fill;
-    ctx.beginPath();
-    ctx.arc(x, y, rr, 0, Math.PI * 2);
-    ctx.fill();
+    circle(ctx, x, y, rr);
     ctx.fillStyle = color;
   };
 
@@ -66,9 +55,7 @@ export function drawIcon(ctx: CanvasRenderingContext2D, name: string, cx: number
       ctx.stroke();
       break;
     case 'clock':
-      ctx.beginPath();
-      ctx.arc(0, 0, r * 0.85, 0, Math.PI * 2);
-      ctx.fill();
+      circle(ctx, 0, 0, r * 0.85);
       ctx.strokeStyle = hole;
       ctx.beginPath();
       ctx.moveTo(0, -r * 0.5);
@@ -115,9 +102,7 @@ export function drawIcon(ctx: CanvasRenderingContext2D, name: string, cx: number
       ctx.stroke();
       break;
     case 'user':
-      ctx.beginPath();
-      ctx.arc(0, -r * 0.35, r * 0.38, 0, Math.PI * 2);
-      ctx.fill();
+      circle(ctx, 0, -r * 0.35, r * 0.38);
       ctx.beginPath();
       ctx.ellipse(0, r * 0.75, r * 0.75, r * 0.55, 0, Math.PI, 0);
       ctx.fill();

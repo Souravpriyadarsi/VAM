@@ -82,11 +82,12 @@ Video is rendered frame by frame and encoded with WebCodecs (via [mediabunny](ht
 
 ```
 src/
-  generators/        one module per asset family
-    types.ts         Generator / Control / Params contracts
+  generators/        one module per generator, grouped by category
+    thumbnails/  channel/  titles/  overlays/  endScreens/
+    types.ts         Generator / Control / Params contracts, plus opts(), onlyIf(), stylePresets()
     index.ts         the registry: add new generators here
   lib/
-    draw.ts          canvas helpers: easing, text fitting, backgrounds, patterns, icons
+    draw.ts          canvas helpers: easing, setStyle, shapes, text fitting, backgrounds, patterns
     overlay.ts       shared "transparent / green screen" background control
     export.ts        PNG + video export (renderFrame is the single render path)
     fonts.ts         preloads web fonts so canvas text renders correctly
@@ -97,8 +98,12 @@ src/
     icons.ts         canvas-drawn glyphs (pin, price, calendar…)
     thumb.ts         downscaled previews for home cards and style presets
     sizes.ts         formats (16:9, 9:16, 1:1, 4:5) and resolution tiers (1080p / 2K / 4K)
-  components/        controls panel, style presets, card previews, export dialog
-  pages/             Home and GeneratorPage
+    useStoredState.ts   useState that persists to localStorage / sessionStorage
+  components/        controls panel and fields, style presets, card previews, export dialog, icons
+  pages/
+    Home.tsx         search, category chips, favourites
+    editor/          GeneratorPage plus its toolbar, stage, timeline and hooks
+  styles/            base, home, editor, panel and dialog stylesheets
 ```
 
 ## Adding a generator
@@ -106,9 +111,10 @@ src/
 A generator is a plain object. The UI, preview, timeline, persistence and export all come from this definition:
 
 ```ts
-import type { Generator } from './types';
-import { backgroundControls, drawBackground, font } from '../lib/draw';
-import { LANDSCAPE, VERTICAL } from '../lib/sizes';
+// src/generators/titles/myCard.ts
+import type { Generator } from '../types';
+import { backgroundControls, drawBackground, font, setStyle } from '../../lib/draw';
+import { LANDSCAPE, VERTICAL } from '../../lib/sizes';
 
 export const myCard: Generator = {
   id: 'my-card',                      // URL: #/g/my-card
@@ -124,9 +130,8 @@ export const myCard: Generator = {
   ],
   render(ctx, p, t, { width, height, preview }) {
     drawBackground(ctx, p, width, height, t);
-    ctx.font = font('Anton', 120);
-    ctx.fillStyle = '#fff';
-    ctx.globalAlpha = Math.min(1, t);  // fade in over the first second
+    // setStyle assigns several drawing-state properties at once; globalAlpha fades in over the first second.
+    setStyle(ctx, { font: font('Anton', 120), fillStyle: '#fff', globalAlpha: Math.min(1, t) });
     ctx.fillText(p.title as string, 100, height / 2);
   },
 };
@@ -135,6 +140,7 @@ export const myCard: Generator = {
 Then add it to `GENERATORS` in `src/generators/index.ts`.
 
 Optional extras:
+- Select options can be written as `options: opts({ value: 'Label', ... })`, and `onlyIf(controls, (p) => …)` shows a set of controls conditionally.
 - `presets: stylePresets(base, { Name: overrides, ... })` adds one-click looks. Each preset is `base` plus its overrides, so switching presets never leaves part of the previous look behind.
 - `handles: [{ x: 'posX', y: 'posY' }]` makes number controls holding percentages (0–100) draggable on the preview.
 - `cardCrop: [x, y, w, h]` zooms the home-page card into part of the frame, for small overlays.
@@ -146,4 +152,4 @@ Rules for `render`:
 - It must be a pure function of `(params, t, size)`, because export seeks to arbitrary times. For randomness, use `seeded()`, not `Math.random()`.
 - Lay things out relative to `width` and `height`. A unit like `u = Math.min(w, h) / 1080` works well, so every format and resolution tier looks the same. Scale shadow blurs and offsets by it too, because canvas transforms don't scale them.
 - Only draw guides or placeholders when `preview` is true.
-- For looping assets, make every motion periodic over the duration (see `stream.ts`).
+- For looping assets, make every motion periodic over the duration (see `titles/stream.ts`).

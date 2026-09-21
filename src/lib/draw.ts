@@ -1,4 +1,5 @@
 import type { Control, Params } from '../generators/types';
+import { opts } from '../generators/types';
 
 // ---------- math & easing ----------
 
@@ -60,20 +61,14 @@ export function contrastText(hex: string) {
   return luma(hex) > 150 ? '#111111' : '#ffffff';
 }
 
+/** Layout unit relative to a 1920-wide landscape frame (a little larger on tall frames), so title
+ * layouts scale sensibly across 16:9, 9:16 and 1:1. */
+export const frameUnit = (w: number, h: number) => (Math.min(w, h * (16 / 9)) / 1920) * (w < h ? 1.6 : 1);
+
 // ---------- fonts ----------
 
-export const FONT_OPTIONS = [
-  { value: 'Anton', label: 'Anton' },
-  { value: 'Bebas Neue', label: 'Bebas Neue' },
-  { value: 'Montserrat', label: 'Montserrat' },
-  { value: 'Poppins', label: 'Poppins' },
-  { value: 'Inter', label: 'Inter' },
-  { value: 'Oswald', label: 'Oswald' },
-  { value: 'Bangers', label: 'Bangers' },
-  { value: 'Permanent Marker', label: 'Permanent Marker' },
-  { value: 'Playfair Display', label: 'Playfair Display' },
-  { value: 'Roboto Mono', label: 'Roboto Mono' },
-];
+const FONTS = ['Anton', 'Bebas Neue', 'Montserrat', 'Poppins', 'Inter', 'Oswald', 'Bangers', 'Permanent Marker', 'Playfair Display', 'Roboto Mono'];
+export const FONT_OPTIONS = FONTS.map((f) => ({ value: f, label: f }));
 
 /** Fonts that only ship one weight — asking for 900 would make the browser fake-bold them. */
 const SINGLE_WEIGHT = new Set(['Anton', 'Bebas Neue', 'Bangers', 'Permanent Marker']);
@@ -83,12 +78,36 @@ export function font(family: string, size: number, weight: number | string = 800
   return `${style} ${w} ${Math.max(1, size)}px "${family}", Impact, sans-serif`.trim();
 }
 
+// ---------- canvas state ----------
+
+type CtxStyle = Partial<
+  Pick<
+    CanvasRenderingContext2D,
+    | 'fillStyle' | 'strokeStyle' | 'lineWidth' | 'lineCap' | 'lineJoin' | 'font' | 'textAlign' | 'textBaseline' | 'letterSpacing'
+    | 'shadowColor' | 'shadowBlur' | 'shadowOffsetX' | 'shadowOffsetY' | 'globalAlpha' | 'globalCompositeOperation' | 'filter'
+  >
+>;
+
+/** Set several drawing-state properties in one go (assigned in the order written). */
+export const setStyle = (ctx: CanvasRenderingContext2D, style: CtxStyle) => void Object.assign(ctx, style);
+
 // ---------- shapes & images ----------
 
 export function roundRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   const rr = Math.max(0, Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2));
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, rr);
+}
+
+export function fillRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  roundRectPath(ctx, x, y, w, h, r);
+  ctx.fill();
+}
+
+export function circle(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, mode: 'fill' | 'stroke' = 'fill') {
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx[mode]();
 }
 
 /** Draw an image like CSS `object-fit: cover` into the given box. */
@@ -121,16 +140,11 @@ export function drawContainBottom(ctx: CanvasRenderingContext2D, img: HTMLImageE
 export function dashedPlaceholder(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, label: string) {
   ctx.save();
   ctx.setLineDash([Math.max(8, w / 40), Math.max(6, w / 60)]);
-  ctx.lineWidth = Math.max(2, w / 200);
-  ctx.strokeStyle = 'rgba(255,255,255,0.55)';
-  ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  roundRectPath(ctx, x, y, w, h, Math.min(w, h) * 0.06);
-  ctx.fill();
+  setStyle(ctx, { lineWidth: Math.max(2, w / 200), strokeStyle: 'rgba(255,255,255,0.55)', fillStyle: 'rgba(255,255,255,0.06)' });
+  fillRoundRect(ctx, x, y, w, h, Math.min(w, h) * 0.06);
   ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = 'rgba(255,255,255,0.75)';
-  ctx.font = font('Inter', Math.max(14, Math.min(w, h) * 0.07), 600);
-  ctx.textAlign = 'center';
+  setStyle(ctx, { fillStyle: 'rgba(255,255,255,0.75)', font: font('Inter', Math.max(14, Math.min(w, h) * 0.07), 600), textAlign: 'center' });
   ctx.textBaseline = 'middle';
   const lines = label.split('\n');
   const lh = Math.max(14, Math.min(w, h) * 0.09);
@@ -209,20 +223,9 @@ export const normWord = (w: string) => w.toLowerCase().replace(/[^\p{L}\p{N}']/g
 
 // ---------- shared background block ----------
 
-export const BG_TYPES = [
-  { value: 'gradient', label: 'Linear gradient' },
-  { value: 'radial', label: 'Radial glow' },
-  { value: 'solid', label: 'Solid colour' },
-  { value: 'image', label: 'Image' },
-];
+export const BG_TYPES = opts({ gradient: 'Linear gradient', radial: 'Radial glow', solid: 'Solid colour', image: 'Image' });
 
-export const PATTERNS = [
-  { value: 'none', label: 'None' },
-  { value: 'rays', label: 'Sunburst rays' },
-  { value: 'dots', label: 'Halftone dots' },
-  { value: 'grid', label: 'Grid' },
-  { value: 'stripes', label: 'Diagonal stripes' },
-];
+export const PATTERNS = opts({ none: 'None', rays: 'Sunburst rays', dots: 'Halftone dots', grid: 'Grid', stripes: 'Diagonal stripes' });
 
 /**
  * The standard background control set. Pass `allowTransparent` for overlays that can export with alpha.
@@ -306,9 +309,7 @@ export function drawBackground(ctx: CanvasRenderingContext2D, p: Params, w: numb
 
 export function drawPattern(ctx: CanvasRenderingContext2D, pattern: string, w: number, h: number, opacity: number, t = 0, color = '#ffffff') {
   ctx.save();
-  ctx.globalAlpha = opacity;
-  ctx.fillStyle = color;
-  ctx.strokeStyle = color;
+  setStyle(ctx, { globalAlpha: opacity, fillStyle: color, strokeStyle: color });
   const u = w / 1280;
   if (pattern === 'rays') {
     const n = 24;
@@ -334,9 +335,7 @@ export function drawPattern(ctx: CanvasRenderingContext2D, pattern: string, w: n
         const k = (x / w + y / h) / 2;
         const r = step * 0.45 * k;
         if (r < 0.5) continue;
-        ctx.beginPath();
-        ctx.arc(x + ((y / step) % 2 ? step / 2 : 0), y, r, 0, Math.PI * 2);
-        ctx.fill();
+        circle(ctx, x + ((y / step) % 2 ? step / 2 : 0), y, r);
       }
     }
   } else if (pattern === 'grid') {
@@ -371,8 +370,7 @@ export function drawPattern(ctx: CanvasRenderingContext2D, pattern: string, w: n
 export function drawPlayIcon(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, bg: string, fg: string) {
   ctx.save();
   ctx.fillStyle = bg;
-  roundRectPath(ctx, cx - size / 2, cy - size * 0.35, size, size * 0.7, size * 0.18);
-  ctx.fill();
+  fillRoundRect(ctx, cx - size / 2, cy - size * 0.35, size, size * 0.7, size * 0.18);
   ctx.fillStyle = fg;
   ctx.beginPath();
   ctx.moveTo(cx - size * 0.12, cy - size * 0.17);
@@ -397,12 +395,8 @@ export function drawBell(ctx: CanvasRenderingContext2D, cx: number, cy: number, 
   ctx.quadraticCurveTo(s * 0.62, s * 0.2, s * 0.85, s * 0.45);
   ctx.closePath();
   ctx.fill();
-  ctx.beginPath();
-  ctx.arc(0, s * 0.62, s * 0.2, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(0, -s * 0.8, s * 0.12, 0, Math.PI * 2);
-  ctx.fill();
+  circle(ctx, 0, s * 0.62, s * 0.2);
+  circle(ctx, 0, -s * 0.8, s * 0.12);
   ctx.restore();
 }
 
@@ -420,14 +414,9 @@ export function drawCursor(ctx: CanvasRenderingContext2D, x: number, y: number, 
   ctx.lineTo(8.2, 14.4);
   ctx.lineTo(14.5, 14.4);
   ctx.closePath();
-  ctx.fillStyle = '#ffffff';
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 1.6;
-  ctx.lineJoin = 'round';
-  ctx.shadowColor = 'rgba(0,0,0,0.35)';
+  setStyle(ctx, { fillStyle: '#ffffff', strokeStyle: '#000000', lineWidth: 1.6, lineJoin: 'round', shadowColor: 'rgba(0,0,0,0.35)' });
   // Shadows ignore the transform, so scale them by hand to match the cursor at any resolution.
-  ctx.shadowBlur = 4 * s;
-  ctx.shadowOffsetY = 2 * s;
+  setStyle(ctx, { shadowBlur: 4 * s, shadowOffsetY: 2 * s });
   ctx.fill();
   ctx.shadowColor = 'transparent';
   ctx.stroke();
