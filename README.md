@@ -16,6 +16,7 @@ Every generator exports at **1080p, 2K or 4K**. Formats are 16:9, 9:16 (Shorts),
 | --- | --- | --- |
 | YouTube Thumbnail | Thumbnails | 16:9 · PNG or JPG |
 | VS Comparison (diagonal / straight / lightning split) | Thumbnails | 16:9 · PNG or JPG |
+| Meme Caption (outlined Impact text, caption bars or subtitle strip) | Thumbnails | 16:9, 1:1, 9:16, 4:5 · PNG or JPG |
 | Channel Banner (with safe-area guides) | Channel | 16:9 · PNG or JPG. Defaults to 2K, which is YouTube's 2560×1440 |
 | Channel Avatar (also works as a watermark) | Channel | 1:1 · PNG or JPG |
 | Webcam Frame (glowing facecam border + name tag) | Channel | 16:9, 1:1, 9:16 · transparent video or PNG |
@@ -38,6 +39,11 @@ Every generator exports at **1080p, 2K or 4K**. Formats are 16:9, 9:16 (Shorts),
 | Tier List (S/A/B/C rows that build one by one) | Titles | video |
 | Trend Line Chart (line draws itself, counting callout) | Titles | video |
 | Time Skip Card (“3 hours later” cutaway, banner or stamp) | Titles | video, optionally transparent |
+| Timeline (dated events along a spine, horizontal or vertical) | Titles | video |
+| Head-to-Head Stats (two contenders, bars from the centre) | Titles | video |
+| Donut / Pie Chart (segments sweep in, counting centre total) | Titles | video |
+| Pricing Table (2–4 tiers with ticked features and a popular tier) | Titles | video |
+| Definition Card (dictionary entry with pronunciation and example) | Titles | video |
 | Animated Captions (pop / karaoke / boxed word) | Overlays | transparent video · Shorts first |
 | Comment Highlight (“Replying to …” card) | Overlays | transparent video · Shorts first |
 | Lower Third (4 styles) | Overlays | transparent video |
@@ -57,6 +63,9 @@ Every generator exports at **1080p, 2K or 4K**. Formats are 16:9, 9:16 (Shorts),
 | Chapter Progress Bar | Overlays | transparent video |
 | Social Post Card (avatar, handle, counters that tick up) | Overlays | transparent video |
 | Keystroke Overlay (keycaps for shortcuts, one at a time) | Overlays | transparent video |
+| Screenshot Spotlight (dims the frame, lights one spot, draggable) | Overlays | transparent video |
+| Achievement Toast (console-style unlock with badge and shine) | Overlays | transparent video |
+| Watermark / HUD Counter (corner bug, handle or running counter) | Overlays | transparent video |
 | End Screen (matches YouTube element layout) | End Screens | 16:9 · video |
 | Credits Roll (headings, role — name pairs, closing line) | End Screens | video |
 | Logo Sting (light sweep, bar wipe or pop-in reveal) | End Screens | video, optionally transparent |
