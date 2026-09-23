@@ -3,6 +3,7 @@ import { channelBanner } from './channel/banner';
 import { webcamFrame } from './channel/webcamFrame';
 import { creditsRoll } from './endScreens/credits';
 import { endScreen } from './endScreens/endScreen';
+import { logoSting } from './endScreens/logoSting';
 import { callout } from './overlays/callout';
 import { animatedCaptions } from './overlays/captions';
 import { checklist } from './overlays/checklist';
@@ -10,11 +11,13 @@ import { comicPop } from './overlays/comic';
 import { commentHighlight } from './overlays/comment';
 import { subscriberGoal } from './overlays/goal';
 import { infoTag } from './overlays/infoTag';
+import { keystrokes } from './overlays/keystrokes';
 import { lowerThird } from './overlays/lowerThird';
 import { newsTicker } from './overlays/newsTicker';
 import { progressBar } from './overlays/progressBar';
 import { emojiReactions } from './overlays/reactions';
 import { socialHandles } from './overlays/socialHandles';
+import { socialPost } from './overlays/socialPost';
 import { sponsorCallout } from './overlays/sponsor';
 import { subscribeButton } from './overlays/subscribe';
 import { transitionWipe } from './overlays/transition';
@@ -31,6 +34,7 @@ import { codeWindow } from './titles/codeWindow';
 import { countdown } from './titles/countdown';
 import { introTitle } from './titles/intro';
 import { kineticText } from './titles/kinetic';
+import { lineChart } from './titles/lineChart';
 import { pollResults } from './titles/poll';
 import { quiz } from './titles/quiz';
 import { quoteCard } from './titles/quote';
@@ -38,6 +42,8 @@ import { ranking } from './titles/ranking';
 import { reviewScore } from './titles/reviewScore';
 import { statReveal } from './titles/statReveal';
 import { streamScreen } from './titles/stream';
+import { tierList } from './titles/tierList';
+import { timeSkip } from './titles/timeSkip';
 import type { Category, Generator } from './types';
 
 /** Every generator in the app. To add one, write a module in the matching category folder and list it here. */
@@ -82,6 +88,12 @@ export const GENERATORS: Generator[] = [
   callout,
   progressBar,
   quoteCard,
+  tierList,
+  socialPost,
+  timeSkip,
+  keystrokes,
+  lineChart,
+  logoSting,
 ];
 
 export const CATEGORIES: Category[] = ['Thumbnails', 'Channel', 'Titles', 'Overlays', 'End Screens'];

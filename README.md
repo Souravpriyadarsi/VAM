@@ -35,6 +35,9 @@ Every generator exports at **1080p, 2K or 4K**. Formats are 16:9, 9:16 (Shorts),
 | Stat Reveal (big count-up number with trend chip) | Titles | video |
 | Code Window (editor or terminal typing highlighted code) | Titles | video |
 | Review Score (score ring, category bars, verdict) | Titles | video |
+| Tier List (S/A/B/C rows that build one by one) | Titles | video |
+| Trend Line Chart (line draws itself, counting callout) | Titles | video |
+| Time Skip Card (“3 hours later” cutaway, banner or stamp) | Titles | video, optionally transparent |
 | Animated Captions (pop / karaoke / boxed word) | Overlays | transparent video · Shorts first |
 | Comment Highlight (“Replying to …” card) | Overlays | transparent video · Shorts first |
 | Lower Third (4 styles) | Overlays | transparent video |
@@ -52,8 +55,11 @@ Every generator exports at **1080p, 2K or 4K**. Formats are 16:9, 9:16 (Shorts),
 | Info Tag (location, price, date, time… with icons) | Overlays | transparent video |
 | Callout Annotation | Overlays | transparent video |
 | Chapter Progress Bar | Overlays | transparent video |
+| Social Post Card (avatar, handle, counters that tick up) | Overlays | transparent video |
+| Keystroke Overlay (keycaps for shortcuts, one at a time) | Overlays | transparent video |
 | End Screen (matches YouTube element layout) | End Screens | 16:9 · video |
 | Credits Roll (headings, role — name pairs, closing line) | End Screens | video |
+| Logo Sting (light sweep, bar wipe or pop-in reveal) | End Screens | video, optionally transparent |
 
 **Home page:** search across names, descriptions, tags, sizes and capabilities (try "animated", "transparent", "shorts", "audio"). Press `/` to focus search. You can also filter by category, or star a generator to add it to **Favourites**. Animated cards play when you hover them.
 
